@@ -2,6 +2,14 @@ plugins {
     id 'java'
 }
 
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 
