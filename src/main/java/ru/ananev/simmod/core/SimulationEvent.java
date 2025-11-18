@@ -1,12 +1,10 @@
 package ru.ananev.simmod.core;
 
+import ru.ananev.simmod.data.EventType;
 import ru.ananev.simmod.model.Request;
 
 public class SimulationEvent {
-    public enum EventType {
-        REQUEST_GENERATED,
-        SERVICE_COMPLETED
-    }
+
 
     private final EventType type;
     private final double time;

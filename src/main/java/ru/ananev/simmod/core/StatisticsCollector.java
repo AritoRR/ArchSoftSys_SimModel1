@@ -46,6 +46,9 @@ public class StatisticsCollector {
         System.out.println("Total created: " + totalRequests);
         System.out.println("Total served: " + completedRequests);
         System.out.println("Total refused: " + rejectedRequests);
+        System.out.println("Probability of  refused: " + String.format("%.3f", getRejectionProbability()));
+        System.out.println("Average waiting time: " + String.format("%.3f", getAverageWaitTime()));
+        System.out.println("Average service time: " + String.format("%.3f", getAverageServiceTime()));
 
         System.out.println("\nSources:");
         sourceRequests.forEach((sourceId, count) ->
@@ -54,5 +57,17 @@ public class StatisticsCollector {
         System.out.println("\nDevices:");
         deviceProcessed.forEach((deviceId, count) ->
                 System.out.println("  Device " + deviceId + ": " + count + " requests"));
+    }
+
+    public double getRejectionProbability() {
+        return totalRequests > 0 ? (double) rejectedRequests / totalRequests : 0.0;
+    }
+
+    public double getAverageWaitTime() {
+        return completedRequests > 0 ? totalWaitTime / completedRequests : 0.0;
+    }
+
+    public double getAverageServiceTime() {
+        return completedRequests > 0 ? totalServiceTime / completedRequests : 0.0;
     }
 }
