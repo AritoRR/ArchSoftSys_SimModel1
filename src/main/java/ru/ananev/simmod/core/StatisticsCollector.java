@@ -46,7 +46,7 @@ public class StatisticsCollector {
         System.out.println("Total created: " + totalRequests);
         System.out.println("Total served: " + completedRequests);
         System.out.println("Total refused: " + rejectedRequests);
-        System.out.println("Probability of  refused: " + String.format("%.3f", getRejectionProbability()));
+        System.out.println("Probability of refused: " + String.format("%.3f", getRejectionProbability()));
         System.out.println("Average waiting time: " + String.format("%.3f", getAverageWaitTime()));
         System.out.println("Average service time: " + String.format("%.3f", getAverageServiceTime()));
 
@@ -59,6 +59,37 @@ public class StatisticsCollector {
                 System.out.println("  Device " + deviceId + ": " + count + " requests"));
     }
 
+    // Геттеры с правильными типами возвращаемых значений
+    public int getRejectedRequests() {
+        return rejectedRequests;
+    }
+
+    public int getTotalRequests() {
+        return totalRequests;
+    }
+
+    public int getCompletedRequests() {
+        return completedRequests;
+    }
+
+    public Map<Integer, Integer> getSourceRequests() {
+        return Collections.unmodifiableMap(sourceRequests);
+    }
+
+    public Map<Integer, Integer> getDeviceProcessed() {
+        return Collections.unmodifiableMap(deviceProcessed);
+    }
+
+    // Если нужны Iterable версии (как в вашем запросе)
+    public Iterable<Map.Entry<Integer, Integer>> getSourceRequestsIterable() {
+        return Collections.unmodifiableSet(sourceRequests.entrySet());
+    }
+
+    public Iterable<Map.Entry<Integer, Integer>> getDeviceProcessedIterable() {
+        return Collections.unmodifiableSet(deviceProcessed.entrySet());
+    }
+
+    // Дополнительные геттеры для статистики
     public double getRejectionProbability() {
         return totalRequests > 0 ? (double) rejectedRequests / totalRequests : 0.0;
     }

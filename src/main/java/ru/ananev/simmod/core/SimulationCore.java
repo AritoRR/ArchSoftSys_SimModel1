@@ -20,6 +20,11 @@ public class SimulationCore {
     private final PriorityQueue<SimulationEvent> eventList;
     private boolean isRunning;
 
+    private boolean stepByStepMode = false;
+    private boolean waitingForStep = false;
+
+    private boolean simulationStarted = false;
+
     private final StatisticsCollector statistics;
 
     public SimulationCore(List<Source> sources, Buffer buffer, List<Device> devices) {
@@ -31,6 +36,18 @@ public class SimulationCore {
         this.currentTime = 0.0;
         this.maxSimulationTime = 1000.0;
         this.isRunning = false;
+    }
+
+    public void startSimulation() {
+        if (!simulationStarted) {
+            initialize();
+            simulationStarted = true;
+            isRunning = true;
+        }
+    }
+
+    public boolean isSimulationStarted() {
+        return simulationStarted;
     }
 
     public void initialize() {
@@ -48,9 +65,8 @@ public class SimulationCore {
     }
 
     public void runAutomatic(double simulationTime) {
-        this.currentMode = SimMode.AUTOMATIC;
         this.maxSimulationTime = simulationTime;
-        this.isRunning = true;
+        startSimulation();
 
         System.out.println("=== AUTOMATIC MODE ===");
         System.out.println("=== RUNNING THE SIMULATION ===");
@@ -61,11 +77,15 @@ public class SimulationCore {
             processEvent(nextEvent);
         }
 
-
         isRunning = false;
-        System.out.println("...\n...\n...\n=== THE SIMULATION IS COMPLETE. THE FINAL TIME " + currentTime + " ===");
-
+        System.out.println("=== THE SIMULATION IS COMPLETE ===");
         statistics.printFinalReport();
+    }
+
+    public List<SimulationEvent> getFutureEvents() {
+        List<SimulationEvent> events = new ArrayList<>(eventList);
+        events.sort(Comparator.comparingDouble(SimulationEvent::getTime));
+        return events;
     }
 
     public void runStepByStep(double simulationTime) {
@@ -86,15 +106,12 @@ public class SimulationCore {
 
 
         isRunning = false;
-        System.out.println("=== THE SIMULATION IS COMPLETE. THE FINAL TIME " + currentTime + " ===");
-    }
-
-    public void run() {
-        runAutomatic(maxSimulationTime);
+        System.out.println("=== THE SIMULATION IS COMPLETE ===");
+        statistics.printFinalReport();
     }
 
     public boolean step() {
-        if (!isRunning || eventList.isEmpty() || currentTime >= maxSimulationTime) {
+        if (!simulationStarted || !isRunning || eventList.isEmpty() || currentTime >= maxSimulationTime) {
             return false;
         }
 
@@ -109,10 +126,6 @@ public class SimulationCore {
         System.out.print("\nPress ENTER to continue...");
         scanner.nextLine();
         System.out.println();
-    }
-
-    public void stop() {
-        this.isRunning = false;
     }
 
     private void processEvent(SimulationEvent event) {

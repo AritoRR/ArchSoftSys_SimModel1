@@ -48,8 +48,9 @@ public class Buffer {
             newRequest.setBufferArrivalTime(currentTime);
             pointer = (bufferFreePosition + 1) % size;
             requests[bufferFreePosition] = newRequest;
+        } else {
+            rejectAndReplace(newRequest, currentTime); // ПЕРЕМЕЩЕНО В ELSE
         }
-        rejectAndReplace(newRequest, currentTime);
     }
 
     //Д10З1

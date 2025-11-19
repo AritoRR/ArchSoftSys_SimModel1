@@ -1,25 +1,28 @@
 plugins {
     id 'java'
-}
-
-plugins {
+    id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
-javafx {
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
-}
-
-group = 'org.example'
+group = 'ru.ananev.simmod'
 version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
+javafx {
+    version = '21'
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+application {
+    mainClass = 'ru.ananev.simmod.ui.Main'
 }
 
 test {

@@ -40,7 +40,7 @@ public class Device {
     }
 
     public double generateServiceTime() {
-        return 0.5 * random.nextDouble();
+        return 2 * random.nextDouble();
     }
 
     public double startService(Request request, double currentTime) {
