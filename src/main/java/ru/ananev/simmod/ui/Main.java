@@ -26,24 +26,27 @@ public class Main extends Application {
     private TextArea eventsArea;
     private Label currentTimeLabel;
     private Label statusLabel;
+    private Label configLabel;
     private Button startButton;
     private Button stepButton;
     private Button autoButton;
     private Button resetButton;
+    private Button configButton;
 
     private Thread autoThread;
     private volatile boolean autoRunning = false;
+
+    // Параметры конфигурации по умолчанию
+    private int sourceCount = 3;
+    private int bufferSize = 3;
+    private int deviceCount = 2;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Симулятор СМО");
 
-        // Создаем модель системы
-        List<Source> sources = createSources();
-        Buffer buffer = new Buffer(1, 3);
-        List<Device> devices = createDevices();
-
-        simulationCore = new SimulationCore(sources, buffer, devices);
+        // Создаем начальную конфигурацию
+        createInitialConfiguration();
 
         // Создаем интерфейс
         VBox root = new VBox(10);
@@ -71,6 +74,13 @@ public class Main extends Application {
         updateUI();
     }
 
+    private void createInitialConfiguration() {
+        List<Source> sources = createSources(sourceCount);
+        Buffer buffer = new Buffer(1, bufferSize);
+        List<Device> devices = createDevices(deviceCount);
+        simulationCore = new SimulationCore(sources, buffer, devices);
+    }
+
     private HBox createControlPanel() {
         HBox controlPanel = new HBox(10);
         controlPanel.setAlignment(Pos.CENTER_LEFT);
@@ -78,25 +88,27 @@ public class Main extends Application {
         Label titleLabel = new Label("Симулятор СМО");
         titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        configButton = new Button("Конфигурация");
         startButton = new Button("Старт");
         stepButton = new Button("Шаг");
         autoButton = new Button("Авто");
         resetButton = new Button("Сброс");
 
+        configButton.setOnAction(e -> showConfigurationDialog());
         startButton.setOnAction(e -> startSimulation());
         stepButton.setOnAction(e -> performStep());
         autoButton.setOnAction(e -> startAutoMode());
         resetButton.setOnAction(e -> resetSimulation());
 
-        // Изначально только кнопка Старт активна
+        // Изначально только кнопки Конфигурация и Старт активны
         stepButton.setDisable(true);
         autoButton.setDisable(true);
 
-        statusLabel = new Label("Статус: Нажмите Старт");
+        statusLabel = new Label("Статус: Система сконфигурирована");
         statusLabel.setStyle("-fx-text-fill: gray; -fx-font-weight: bold;");
 
         controlPanel.getChildren().addAll(
-                titleLabel, startButton, stepButton, autoButton, resetButton,
+                titleLabel, configButton, startButton, stepButton, autoButton, resetButton,
                 new Separator(javafx.geometry.Orientation.VERTICAL),
                 statusLabel
         );
@@ -106,12 +118,28 @@ public class Main extends Application {
 
     private HBox createInfoPanel() {
         HBox infoPanel = new HBox(10);
+        infoPanel.setAlignment(Pos.CENTER_LEFT);
 
         currentTimeLabel = new Label("Текущее время: 0.000");
         currentTimeLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        infoPanel.getChildren().add(currentTimeLabel);
+        // Добавляем информацию о конфигурации
+        configLabel = new Label();
+        configLabel.setStyle("-fx-font-size: 12px;");
+        updateConfigLabel();
+
+        infoPanel.getChildren().addAll(
+                currentTimeLabel,
+                new Separator(javafx.geometry.Orientation.VERTICAL),
+                configLabel
+        );
         return infoPanel;
+    }
+
+    private void updateConfigLabel() {
+        String configText = String.format("Конфигурация: Источники=%d, Буфер=%d, Приборы=%d",
+                sourceCount, bufferSize, deviceCount);
+        configLabel.setText(configText);
     }
 
     private VBox createStatusPanel() {
@@ -146,18 +174,88 @@ public class Main extends Application {
         return eventsPanel;
     }
 
-    private List<Source> createSources() {
+    private void showConfigurationDialog() {
+        Stage configStage = new Stage();
+        configStage.setTitle("Конфигурация системы");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 20, 20, 20));
+
+        // Поля ввода
+        Spinner<Integer> sourceSpinner = new Spinner<>(1, 10, sourceCount);
+        sourceSpinner.setEditable(true);
+
+        Spinner<Integer> bufferSpinner = new Spinner<>(1, 20, bufferSize);
+        bufferSpinner.setEditable(true);
+
+        Spinner<Integer> deviceSpinner = new Spinner<>(1, 10, deviceCount);
+        deviceSpinner.setEditable(true);
+
+        grid.add(new Label("Количество источников:"), 0, 0);
+        grid.add(sourceSpinner, 1, 0);
+        grid.add(new Label("Размер буфера:"), 0, 1);
+        grid.add(bufferSpinner, 1, 1);
+        grid.add(new Label("Количество приборов:"), 0, 2);
+        grid.add(deviceSpinner, 1, 2);
+
+        Button applyButton = new Button("Применить");
+        Button cancelButton = new Button("Отмена");
+
+        applyButton.setOnAction(e -> {
+            sourceCount = sourceSpinner.getValue();
+            bufferSize = bufferSpinner.getValue();
+            deviceCount = deviceSpinner.getValue();
+
+            applyNewConfiguration();
+            configStage.close();
+        });
+
+        cancelButton.setOnAction(e -> configStage.close());
+
+        HBox buttonBox = new HBox(10, applyButton, cancelButton);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        grid.add(buttonBox, 0, 3, 2, 1);
+
+        Scene scene = new Scene(grid);
+        configStage.setScene(scene);
+        configStage.showAndWait();
+    }
+
+    private void applyNewConfiguration() {
+        // Создаем новую конфигурацию
+        List<Source> sources = createSources(sourceCount);
+        Buffer buffer = new Buffer(1, bufferSize);
+        List<Device> devices = createDevices(deviceCount);
+
+        simulationCore = new SimulationCore(sources, buffer, devices);
+
+        updateConfigLabel();
+        updateUI();
+
+        // Сбрасываем состояние кнопок
+        startButton.setDisable(false);
+        stepButton.setDisable(true);
+        autoButton.setDisable(true);
+
+        statusLabel.setText("Статус: Система переконфигурирована");
+        statusLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+    }
+
+    private List<Source> createSources(int count) {
         List<Source> sources = new ArrayList<>();
-        sources.add(new Source(1, 1.0));
-        sources.add(new Source(2, 0.5));
-        sources.add(new Source(3, 0.8));
+        for (int i = 1; i <= count; i++) {
+            sources.add(new Source(i, 1.0));
+        }
         return sources;
     }
 
-    private List<Device> createDevices() {
+    private List<Device> createDevices(int count) {
         List<Device> devices = new ArrayList<>();
-        devices.add(new Device(1));
-        devices.add(new Device(2));
+        for (int i = 1; i <= count; i++) {
+            devices.add(new Device(i));
+        }
         return devices;
     }
 
@@ -201,16 +299,18 @@ public class Main extends Application {
         stepButton.setDisable(true);
         autoButton.setDisable(true);
         startButton.setDisable(true);
+        configButton.setDisable(true);
         statusLabel.setText("Статус: Автоматический режим");
         statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
         autoThread = new Thread(() -> {
-            simulationCore.runAutomatic(10.0);
+            simulationCore.runAutomatic(100.0);
 
             Platform.runLater(() -> {
                 autoRunning = false;
                 stepButton.setDisable(true);
                 autoButton.setDisable(true);
+                configButton.setDisable(false);
                 updateUI();
                 showStatistics();
                 statusLabel.setText("Статус: Симуляция завершена");
@@ -246,17 +346,15 @@ public class Main extends Application {
             autoThread.interrupt();
         }
 
-        // Создаем новую симуляцию
-        List<Source> sources = createSources();
-        Buffer buffer = new Buffer(1, 3);
-        List<Device> devices = createDevices();
-        simulationCore = new SimulationCore(sources, buffer, devices);
+        // Пересоздаем симуляцию с текущей конфигурацией
+        applyNewConfiguration();
 
         startButton.setDisable(false);
         stepButton.setDisable(true);
         autoButton.setDisable(true);
+        configButton.setDisable(false);
         updateUI();
-        statusLabel.setText("Статус: Нажмите Старт");
+        statusLabel.setText("Статус: Система сброшена");
         statusLabel.setStyle("-fx-text-fill: gray; -fx-font-weight: bold;");
     }
 

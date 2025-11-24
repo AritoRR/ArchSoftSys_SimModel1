@@ -27,6 +27,7 @@ public class SimulationCore {
 
     private final StatisticsCollector statistics;
 
+    // Только этот конструктор - без консольного меню
     public SimulationCore(List<Source> sources, Buffer buffer, List<Device> devices) {
         this.sources = sources;
         this.buffer = buffer;
@@ -38,6 +39,7 @@ public class SimulationCore {
         this.isRunning = false;
     }
 
+    // Остальные методы остаются без изменений
     public void startSimulation() {
         if (!simulationStarted) {
             initialize();
@@ -104,7 +106,6 @@ public class SimulationCore {
             }
         }
 
-
         isRunning = false;
         System.out.println("=== THE SIMULATION IS COMPLETE ===");
         statistics.printFinalReport();
@@ -130,7 +131,7 @@ public class SimulationCore {
 
     private void processEvent(SimulationEvent event) {
         if (this.currentMode == SimMode.STEP_BY_STEP) {
-        System.out.printf("[%.3f] Event: %s\n", currentTime, event.getType());
+            System.out.printf("[%.3f] Event: %s\n", currentTime, event.getType());
         }
 
         switch (event.getType()) {
@@ -223,7 +224,7 @@ public class SimulationCore {
         statistics.recordServiceStart(nextRequest, currentTime);
 
         if (this.currentMode == SimMode.STEP_BY_STEP) {
-            System.out.printf("[%.3f] Request %s started on the device %d\n",
+            System.out.printf("[%.3f] Request %s started on the device %d (service time: %.3f)\n",
                     currentTime, nextRequest.getId(), freeDevice.getId(), serviceTime);
         }
 
