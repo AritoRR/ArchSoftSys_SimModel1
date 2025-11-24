@@ -7,20 +7,30 @@ import java.util.Random;
 public class Device {
 
     private final int id;
+    private final String name;
     private boolean isBusy;
     private Request currentRequest;
 
     private final Random random;
 
-    public Device(int id) {
+    public Device(int id, String name) {
         this.id = id;
+        this.name = name;
         random = new Random();
         isBusy = false;
         currentRequest = null;
     }
 
+    public Device(int id) {
+        this(id, null);
+    }
+
     public int getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isBusy() {
@@ -40,7 +50,12 @@ public class Device {
     }
 
     public double generateServiceTime() {
-        return 2 * random.nextDouble();
+        // Время доставки зависит от типа курьера
+        if (id == 1) {
+            return 0.5 + random.nextDouble(); // Приоритетный курьер - быстрее
+        } else {
+            return 1.0 + 2 * random.nextDouble(); // Обычный курьер - медленнее
+        }
     }
 
     public double startService(Request request, double currentTime) {
@@ -66,7 +81,4 @@ public class Device {
 
         return finishedRequest;
     }
-
-
-
 }

@@ -1,6 +1,7 @@
 package ru.ananev.simmod.model;
 
 import ru.ananev.simmod.data.RequestStatus;
+import ru.ananev.simmod.data.RequestList;
 
 public class Request {
 
@@ -9,13 +10,14 @@ public class Request {
     public final int sourceId;
     public final int requestId;
     private final Double generationTime;
+    private final String foodItem;
 
     // Статус и позиции
     private RequestStatus status;
     private int bufferId;
     private int deviceId;
 
-    //Временные метки
+    // Временные метки
     private Double bufferArrivalTime;
     private Double serviceArrivalTime;
     private Double endTime;
@@ -25,6 +27,7 @@ public class Request {
         this.sourceId = sourceId;
         this.requestId = requestId;
         this.id = String.format("%s.%s", sourceId, requestId);
+        this.foodItem = RequestList.getRandomFood();
         this.status = RequestStatus.CREATED;
         this.bufferId = -1;
         this.deviceId = -1;
@@ -35,6 +38,10 @@ public class Request {
 
     public String getId() {
         return id;
+    }
+
+    public String getFoodItem() {
+        return foodItem;
     }
 
     public int getSourceId() {
@@ -60,6 +67,7 @@ public class Request {
     public int getBufferId() {
         return bufferId;
     }
+
     public void setBufferId(int bufferId) {
         this.bufferId = bufferId;
     }
@@ -95,5 +103,4 @@ public class Request {
     public void setEndTime(Double endTime) {
         this.endTime = endTime;
     }
-
 }
