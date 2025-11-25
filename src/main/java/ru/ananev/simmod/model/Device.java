@@ -50,12 +50,8 @@ public class Device {
     }
 
     public double generateServiceTime() {
-        // Время доставки зависит от типа курьера
-        if (id == 1) {
-            return 0.5 + random.nextDouble(); // Приоритетный курьер - быстрее
-        } else {
-            return 1.0 + 2 * random.nextDouble(); // Обычный курьер - медленнее
-        }
+        // Время обработки пакета (0.1-2.0 мс)
+        return 0.1 + 1.9 * random.nextDouble();
     }
 
     public double startService(Request request, double currentTime) {

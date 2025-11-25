@@ -63,15 +63,15 @@ public class SimulationCore {
 
         buffer.setRequests(new Request[buffer.getSize()]);
 
-        System.out.println("The simulation has been initialized. Time: " + currentTime);
+        //System.out.println("The simulation has been initialized. Time: " + currentTime);
     }
 
     public void runAutomatic(double simulationTime) {
         this.maxSimulationTime = simulationTime;
         startSimulation();
 
-        System.out.println("=== AUTOMATIC MODE ===");
-        System.out.println("=== RUNNING THE SIMULATION ===");
+        //System.out.println("=== AUTOMATIC MODE ===");
+        //System.out.println("=== RUNNING THE SIMULATION ===");
 
         while (isRunning && currentTime < maxSimulationTime && !eventList.isEmpty()) {
             SimulationEvent nextEvent = eventList.poll();
@@ -80,8 +80,7 @@ public class SimulationCore {
         }
 
         isRunning = false;
-        System.out.println("=== THE SIMULATION IS COMPLETE ===");
-        statistics.printFinalReport();
+        //System.out.println("=== THE SIMULATION IS COMPLETE ===");
     }
 
     public List<SimulationEvent> getFutureEvents() {
@@ -95,8 +94,8 @@ public class SimulationCore {
         this.maxSimulationTime = simulationTime;
         this.isRunning = true;
 
-        System.out.println("=== STEP_BY_STEP MODE ===");
-        System.out.println("=== RUNNING THE SIMULATION ===");
+        //System.out.println("=== STEP_BY_STEP MODE ===");
+        //System.out.println("=== RUNNING THE SIMULATION ===");
 
         while (isRunning && currentTime < maxSimulationTime && !eventList.isEmpty()) {
             waitForEnter();
@@ -107,8 +106,7 @@ public class SimulationCore {
         }
 
         isRunning = false;
-        System.out.println("=== THE SIMULATION IS COMPLETE ===");
-        statistics.printFinalReport();
+        //System.out.println("=== THE SIMULATION IS COMPLETE ===");
     }
 
     public boolean step() {
@@ -124,14 +122,14 @@ public class SimulationCore {
     }
 
     private void waitForEnter() {
-        System.out.print("\nPress ENTER to continue...");
+        //System.out.print("\nPress ENTER to continue...");
         scanner.nextLine();
         System.out.println();
     }
 
     private void processEvent(SimulationEvent event) {
         if (this.currentMode == SimMode.STEP_BY_STEP) {
-            System.out.printf("[%.3f] Event: %s\n", currentTime, event.getType());
+            //System.out.printf("[%.3f] Event: %s\n", currentTime, event.getType());
         }
 
         switch (event.getType()) {
@@ -144,7 +142,7 @@ public class SimulationCore {
                 break;
 
             default:
-                System.out.println("Unknown type of event: " + event.getType());
+                //System.out.println("Unknown type of event: " + event.getType());
         }
     }
 
@@ -154,8 +152,8 @@ public class SimulationCore {
 
         Request request = source.generateNextRequest();
         if (this.currentMode == SimMode.STEP_BY_STEP) {
-            System.out.printf("[%.3f] Source %d created request %s\n",
-                    currentTime, sourceId, request.getId());
+            //System.out.printf("[%.3f] Source %d created request %s\n",
+                    //currentTime, sourceId, request.getId());
         }
 
         processRequestArrival(request);
@@ -171,8 +169,8 @@ public class SimulationCore {
         if (freePosition != -1) {
             buffer.addRequest(request, currentTime);
             if (this.currentMode == SimMode.STEP_BY_STEP) {
-                System.out.printf("[%.3f] Request %s in buffer on position: %d\n",
-                        currentTime, request.getId(), freePosition);
+               // System.out.printf("[%.3f] Request %s in buffer on position: %d\n",
+                       // currentTime, request.getId(), freePosition);
             }
 
             tryStartServiceFromBuffer();
@@ -181,8 +179,8 @@ public class SimulationCore {
             if (rejectedRequest != null) {
                 statistics.recordRequestRejection(rejectedRequest, currentTime);
                 if (this.currentMode == SimMode.STEP_BY_STEP) {
-                    System.out.printf("[%.3f] newRequest %s displaced oldRequest %s\n",
-                            currentTime, request.getId(), rejectedRequest.getId());
+                   // System.out.printf("[%.3f] newRequest %s displaced oldRequest %s\n",
+                            //currentTime, request.getId(), rejectedRequest.getId());
                 }
             }
 
@@ -198,8 +196,8 @@ public class SimulationCore {
         if (completedRequest != null) {
             statistics.recordServiceCompletion(completedRequest, currentTime);
             if (this.currentMode == SimMode.STEP_BY_STEP) {
-                System.out.printf("[%.3f] Request %s completed on the device %d\n",
-                        currentTime, completedRequest.getId(), device.getId());
+//                System.out.printf("[%.3f] Request %s completed on the device %d\n",
+//                        currentTime, completedRequest.getId(), device.getId());
             }
 
             tryStartServiceFromBuffer();
@@ -224,8 +222,8 @@ public class SimulationCore {
         statistics.recordServiceStart(nextRequest, currentTime);
 
         if (this.currentMode == SimMode.STEP_BY_STEP) {
-            System.out.printf("[%.3f] Request %s started on the device %d (service time: %.3f)\n",
-                    currentTime, nextRequest.getId(), freeDevice.getId(), serviceTime);
+//            System.out.printf("[%.3f] Request %s started on the device %d (service time: %.3f)\n",
+//                    currentTime, nextRequest.getId(), freeDevice.getId(), serviceTime);
         }
 
         scheduleServiceCompletion(nextRequest, endTime);

@@ -41,24 +41,6 @@ public class StatisticsCollector {
         deviceProcessed.merge(request.getDeviceId(), 1, Integer::sum);
     }
 
-    public void printFinalReport() {
-        System.out.println("\n=== FINAL STATISTICS ===");
-        System.out.println("Total created: " + totalRequests);
-        System.out.println("Total served: " + completedRequests);
-        System.out.println("Total refused: " + rejectedRequests);
-        System.out.println("Probability of refused: " + String.format("%.3f", getRejectionProbability()));
-        System.out.println("Average waiting time: " + String.format("%.3f", getAverageWaitTime()));
-        System.out.println("Average service time: " + String.format("%.3f", getAverageServiceTime()));
-
-        System.out.println("\nSources:");
-        sourceRequests.forEach((sourceId, count) ->
-                System.out.println("  Source " + sourceId + ": " + count + " requests"));
-
-        System.out.println("\nDevices:");
-        deviceProcessed.forEach((deviceId, count) ->
-                System.out.println("  Device " + deviceId + ": " + count + " requests"));
-    }
-
     // Геттеры с правильными типами возвращаемых значений
     public int getRejectedRequests() {
         return rejectedRequests;

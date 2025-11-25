@@ -10,7 +10,7 @@ public class Request {
     public final int sourceId;
     public final int requestId;
     private final Double generationTime;
-    private final String foodItem;
+    private final String packetInfo;
 
     // Статус и позиции
     private RequestStatus status;
@@ -26,8 +26,8 @@ public class Request {
         this.generationTime = generationTime;
         this.sourceId = sourceId;
         this.requestId = requestId;
-        this.id = String.format("%s.%s", sourceId, requestId);
-        this.foodItem = RequestList.getRandomFood();
+        this.id = String.format("P%d.%d", sourceId, requestId);
+        this.packetInfo = RequestList.generatePacketInfo();
         this.status = RequestStatus.CREATED;
         this.bufferId = -1;
         this.deviceId = -1;
@@ -40,8 +40,8 @@ public class Request {
         return id;
     }
 
-    public String getFoodItem() {
-        return foodItem;
+    public String getPacketInfo() {
+        return packetInfo;
     }
 
     public int getSourceId() {
